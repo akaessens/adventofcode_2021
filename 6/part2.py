@@ -1,33 +1,25 @@
-from joblib import Parallel, delayed
+# Manually spawning the fish is too slow, even when parallelized on all CPUs
+# https://github.com/barrychocolate/Advent_of_code_2021/blob/main/day_6/day_6.ipynb
 import numpy as np
+from collections import Counter
 
-
-def process(fish, day):
-    for idx in range(len(fish)):
-        if fish[idx] == 0:
-            fish[idx] = 6
-            fish = np.append(fish,8)
-        else:
-            fish[idx] -= 1
-
-    #print("Day {:2,}".format(day), fish)
-    return fish
-
-with open('input.txt', 'r') as inputfile:
-    lines = inputfile.readlines()
-
-fish = np.array(list(map(int, lines[0].split(","))))
+fish = np.loadtxt("input.txt", dtype='int', delimiter=',')
 
 days = 256
-jobs = 8
-for day in range(1,days+1):
+count = Counter(fish)
 
-    chunks = np.array_split(fish, jobs)
+for day in range(days):
+    mothers = count[0]
+    count[0] = count[1]
+    count[1] = count[2]
+    count[2] = count[3]
+    count[3] = count[4]
+    count[4] = count[5]
+    count[5] = count[6]
+    count[6] = count[7]
+    count[6] = count[6] + mothers
+    count[7] = count[8]
+    count[8] = mothers
 
-    results = Parallel(n_jobs=jobs)(delayed(process)(chunk, day) for chunk in chunks)
-
-    fish = np.concatenate(results)
-
-    print("Day {:2,}".format(day), fish)
-
-print("Sum of", len(fish))
+# return the sum of all fish
+print("Sum of", sum(count.values()))
